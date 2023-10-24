@@ -22,7 +22,7 @@ import okhttp3.Credentials;
 
 public class MainActivity extends AppCompatActivity {
     TextView txtResponse;
-    private static final String API_URL = "http://www.sail-steel.com/qrcode/QRCode_FetchSet?sap-client=600"; // Replace with your API endpoint
+    private static final String API_URL = "http://www.sail-steel.com/qrcode/QRCode_FetchSet?sap-client=600";
     private static final String USERNAME = "APIUSER";
     private static final String PASSWORD = "Sail@123";
 
