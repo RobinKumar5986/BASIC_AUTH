@@ -12,19 +12,21 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.TimeZone;
 
-import okhttp3.Call;
-import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.Credentials;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
     TextView txtResponse;
-    private static final String API_URL = "http://";
+//    private static final String API_URL = "http://";
     private static final String USERNAME = "APIUSER";
     private static final String PASSWORD = "Sail@123";
 
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
         // Create an OkHttpClient instance
         OkHttpClient client = new OkHttpClient();
 
-        String credentials = Credentials.basic(USERNAME, PASSWORD);
-        Toast.makeText(this, credentials, Toast.LENGTH_SHORT).show();
+//        String credentials = Credentials.basic(USERNAME, PASSWORD);
+        Toast.makeText(this, "Started", Toast.LENGTH_SHORT).show();
 
 //        Request request = new Request.Builder()
 //                .url(API_URL)
@@ -47,17 +49,32 @@ public class MainActivity extends AppCompatActivity {
 //                .header("Accept","application/json")
 //                .header("X-Requested-With","X")
 //                .build();
-        OkHttpClient httpClient = new OkHttpClient.Builder()
-                .build();
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        // Create the JSON data as a string
+        String jsonData = "{" +
+                "\"Opid\":\"OP14\"," +
+                "\"QRCode\":\"https://madeinindia.qcin.org/product-details/e159952145ca436fad9bab058fa591e5/NB049264\"," +
+                "\"HdrToItem\": []" +
+                "}";
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(JSON, jsonData);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API_URL)
-                .client(httpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        MyApiService apiService = retrofit.create(MyApiService.class);
+        Call<Void> call = apiService.performPostRequest(requestBody);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    int statusCode = response.code();
+                    Log.d("API RESPONSE",statusCode+"");
+                } else {
+                    Log.d("API RESPONSE",response.toString());
+                }
+            }
 
-        MyData requestData = new MyData("value1", "value2");
-        Call<YourResponseModel> modelCall;
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.d("API RESPONSE",t.toString());
+            }
+        });
     }
 }
