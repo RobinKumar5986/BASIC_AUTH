@@ -18,11 +18,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Credentials;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
     TextView txtResponse;
-    private static final String API_URL = "http://www.sail-steel.com/qrcode/QRCode_FetchSet?sap-client=600";
+    private static final String API_URL = "http://";
     private static final String USERNAME = "APIUSER";
     private static final String PASSWORD = "Sail@123";
 
@@ -37,26 +39,25 @@ public class MainActivity extends AppCompatActivity {
         String credentials = Credentials.basic(USERNAME, PASSWORD);
         Toast.makeText(this, credentials, Toast.LENGTH_SHORT).show();
 
-        Request request = new Request.Builder()
-                .url(API_URL)
-                .header("Authorization", credentials)
-                .header("Content-Type","application/json")
-                .header("time-zone", TimeZone.getDefault().getID())
-                .header("Accept","application/json")
-                .header("X-Requested-With","X")
+//        Request request = new Request.Builder()
+//                .url(API_URL)
+//                .header("Authorization", credentials)
+//                .header("Content-Type","application/json")
+//                .header("time-zone", TimeZone.getDefault().getID())
+//                .header("Accept","application/json")
+//                .header("X-Requested-With","X")
+//                .build();
+        OkHttpClient httpClient = new OkHttpClient.Builder()
                 .build();
 
-        // Execute the request in a background thread
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.e("OkHttp", "Request failed: " + e.getMessage());
-            }
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        MyApiService apiService = retrofit.create(MyApiService.class);
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    Log.e("OkHttp", response.toString());
-            }
-        });
+        MyData requestData = new MyData("value1", "value2");
+        Call<YourResponseModel> modelCall;
     }
 }
